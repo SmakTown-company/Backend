@@ -1,0 +1,68 @@
+version: '3.1'
+
+services:
+  
+  
+  db_auth:
+    # Название контейнера
+    container_name: db_auth 
+    # Значение переменных окружения
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Образ контейнера который будет скачан из DockerHub
+    image: postgres:15-alpine
+    # Порты которые будут использоваться в контейнере
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    # Меняем порт по умолчанию в Postgres контейнере
+    command: 
+      - 'postgres'
+      - '-c'
+      - 'port=${POSTGRES_PORT}'
+    # Настройки хранилища данных, необходим для сохранения
+    # данных в базе данных при остановке контейнера
+    volumes:
+      - db_auth_vol:/var/lib/postgresql/data
+    # Объявляем внутреннюю сеть докера, для
+    # передачи данных между контейнерами
+    networks:
+      - server_net
+ # Cервис для управления пользователем
+  auth:
+    # Название контейнера
+    container_name: auth
+    # Папка контейнера для сборки
+    build: ./auth
+    # Указывает, что контейнер должен ждать запуск контейнеров
+    # Так как необходимо, чтобы MongoDB и Redis были запущены
+    depends_on:
+      - db_auth
+    # Объявляем внутренную сеть докера, для 
+    # передачи данных между контейнерами
+    networks:
+      - server_net
+    # Порты, которые будут использоваться в контейнере
+    ports:
+      - ${AUTH_PORT}:${AUTH_PORT}
+    # Внешние переменные окружения
+    environment:
+      # Порт который будет использоваться в контейнере
+      AUTH_PORT: ${AUTH_PORT}
+      # Секретный ключ для аутентификации
+      JWT_SECRET: ${JWT_SECRET}
+      # Настройки MongoDB, укзаваем в контейнере
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_NAME: ${POSTGRES_NAME}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USE_SSL: ${POSTGRES_USE_SSL}
+# Конфигурация для хранилища данных
+volumes:
+  db_auth_vol: {}
+
+# Настройки сетей
+networks:
+  server_net:
+    driver: bridge
