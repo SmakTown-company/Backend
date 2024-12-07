@@ -20,13 +20,13 @@ func getUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не найден"})
 		return
 	}
-	// Создаем анонимную структуру с id и email
+	// Создаем анонимную структуру с id и phone
 	userResponse := struct {
 		ID    uint   `json:"id"`
-		Email string `json:"email"`
+		Phone string `json:"phone"`
 	}{
 		ID:    userID,
-		Email: user.Email,
+		Phone: user.Phone,
 	}
 	ctx.JSON(http.StatusOK, gin.H{"user": userResponse})
 }

@@ -17,13 +17,13 @@ func signIn(ctx *gin.Context) {
 	}
 
 	var user models.User
-	result := database.DB.Where("email = ?", registerData.Email).First(&user)
+	result := database.DB.Where("phone = ?", registerData.Phone).First(&user)
 	if result.Error != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный email или пароль"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный телефон или пароль"})
 		return
 	}
 	if !utils.CheckPasswordHash(registerData.Password, user.Hash) {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный email или пароль"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный телефон или пароль"})
 		return
 	}
 	tokens, err := utils.GenerateTokens(user.ID)
@@ -32,13 +32,13 @@ func signIn(ctx *gin.Context) {
 		return
 	}
 
-	// Создаем анонимную функцию с только id и email
+	// Создаем анонимную функцию с только id и phone
 	userResponse := struct {
 		ID    uint   `json:"id"`
-		Email string `json:"email"`
+		Phone string `json:"phone"`
 	}{
 		ID:    user.ID,
-		Email: user.Email,
+		Phone: user.Phone,
 	}
 	ctx.JSON(http.StatusOK, gin.H{"tokens": tokens, "user": userResponse})
 

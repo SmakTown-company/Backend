@@ -25,15 +25,22 @@ func registerUserHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при хэшировании пароля"})
 		return
 	}
-	user.Email = registerData.Email
+	// Проверяем валидность телефона
+	validPhone, err := utils.IsValidPhone(registerData.Phone)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Неверный номер телефона"})
+		return
+	}
+
+	user.Phone = validPhone
 	user.Hash = hashedPassword
 	// Сохраняем пользователя в базу данных
 	result := database.DB.Create(&user)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить пользователя"})
 		return
-	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "Регистрация пользователя прошла успешно"})
 	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Регистрация пользователя прошла успешно"})
 
 }

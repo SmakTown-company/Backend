@@ -3,7 +3,9 @@ package utils
 import (
 	"auth/envs"
 	"auth/models"
+	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -92,4 +94,43 @@ func ExtractUserID(tokenString string) (uint, error) {
 		}
 	}
 	return 0, fmt.Errorf("Невозможно извлечь user_id из токена")
+}
+
+// IsValidPhone проверяет, является ли номер телефона валидным и возвращает сам номер и ошибку
+func IsValidPhone(phone string) (string, error) {
+	// Если номер пустой, возвращаем ошибку
+	if phone == "" {
+		return "", errors.New("номер телефона не может быть пустым")
+	}
+
+	// Убираем пробелы, если они есть
+	phone = strings.TrimSpace(phone)
+
+	// Если номер начинается с "+", то он должен содержать 11 цифр
+	if phone[0] == '+' {
+		if len(phone) == 12 && regexp.MustCompile(`^\+7\d{10}$`).MatchString(phone) {
+			return phone, nil
+		}
+		return "", errors.New("телефонный номер, начинающийся с '+', должен содержать ровно 12 цифр после '+'")
+	}
+
+	// Если номер начинается с цифры или открывающей скобки, то он должен содержать 10 цифр
+	if phone[0] == '(' || (phone[0] >= '0' && phone[0] <= '9') {
+		if len(phone) == 10 && regexp.MustCompile(`^8\d{10}$`).MatchString(phone) {
+			return phone, nil
+		}
+		return "", errors.New("телефонный номер, начинающийся с цифры или '(', должен содержать ровно 10 цифр")
+	}
+
+	// Регулярное выражение для проверки номера с дефисами и скобками
+	re := `^\+7[\s\(\)-]?\d{3}[\s\(\)-]?\d{3}[\s\(\)-]?\d{2}[\s\(\)-]?\d{2}$`
+	match, _ := regexp.MatchString(re, phone)
+
+	// Проверка на корректность формата и что номер заканчивается цифрой
+	if match && phone[len(phone)-1] >= '0' && phone[len(phone)-1] <= '9' {
+		return phone, nil
+	}
+
+	// Если невалидный номер, возвращаем ошибку
+	return "", errors.New("неверный формат телефонного номера")
 }

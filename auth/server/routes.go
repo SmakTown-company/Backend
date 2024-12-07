@@ -11,9 +11,9 @@ func InitRoutes() {
 	// Инициализация роута (по умолчанию)
 	router := gin.Default()
 	// Создание пользователя
-	router.PUT("/user", handlers.RegisterUserHandler)
+	router.POST("/register", handlers.RegisterUserHandler)
 	// Авторизация пользователя
-	router.POST("/user", handlers.SignInHandler)
+	router.POST("/signIn", handlers.SignInHandler)
 	// Обновление токена
 	router.PUT("/refresh", handlers.RefreshTokenHandler)
 	// Получение данных пользователя
