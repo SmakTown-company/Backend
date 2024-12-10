@@ -1,8 +1,59 @@
-version: '3.1'
+
 
 services:
-  
-  
+  # БД для сервиса с картами
+  db_card:
+    # Название контейнера
+    container_name: db_card
+    # Значения переменных окружения
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    # Образ для контейнера который будет скачан из DockerHub
+    image: mongo:5.0.25
+    # Меняем порт MongoDB в контейнере
+    command: mongod --port ${MONGO_INITDB_PORT}
+    # Порты, которые будут использоваться в контейнере
+    ports:
+      - ${MONGO_INITDB_PORT}:${MONGO_INITDB_PORT}
+    # Настройки хранилища данных, необходим для сохранения
+    # данных в базе данных при остановке контейнера
+    volumes:
+      - db_card_vol:/var/data/db/data/configdb
+    # Объявляем внутренную сеть докера, для 
+    # передачи данных между контейнерами
+    networks:
+      - server_net
+  # Сервис для управлением заметками 
+  card:
+    # Название контейнера
+    container_name: card 
+    # Папка контейнера для сборки
+    build: ./card
+    # Указывает, что контейнер должен ждать запуск контейнеров
+    depends_on:
+      - db_card 
+    # Объявляем внутреннюю сеть докера, для 
+    # передачи данных между контейнерами
+    networks:
+      - server_net
+    # Порты которые будут использоваться в контейнере
+    ports:
+      - ${CARD_PORT}:${CARD_PORT}
+    # Внешние переменные окружения
+    environment:
+      # Порт который будет использоваться в контейнере
+      CARD_PORT: ${CARD_PORT}
+      # Секретный ключ для аутентификации
+      JWT_SECRET: ${JWT_SECRET}
+      # Настройки MongoDB, указываем в контейнере 
+      MONGO_INITDB_HOST: ${MONGO_INITDB_HOST}
+      MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      
+
+  # БД для сервиса управления пользователями
   db_auth:
     # Название контейнера
     container_name: db_auth 
@@ -60,7 +111,9 @@ services:
       POSTGRES_USE_SSL: ${POSTGRES_USE_SSL}
 # Конфигурация для хранилища данных
 volumes:
+  db_card_vol: {}
   db_auth_vol: {}
+  
 
 # Настройки сетей
 networks:
