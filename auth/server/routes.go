@@ -4,26 +4,38 @@ import (
 	"auth/envs"
 	"auth/handlers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRoutes() {
 	// Инициализация роута (по умолчанию)
 	router := gin.Default()
-	// Создание пользователя
-	router.POST("/register", handlers.RegisterUserHandler)
-	// Авторизация пользователя
+
+	// Настройка CORS (должна быть до определения маршрутов)
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},                   // Разрешаем доступ только с этого домена
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Разрешаем методы
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Разрешаем заголовки
+		AllowCredentials: true,                                                // Разрешаем использование cookies и других учётных данных
+		MaxAge:           12 * 3600,                                           // Максимальное время кеширования CORS в секундах (12 часов)
+	}))
+
+	// Роуты
+	router.POST("SmakTown/API/register", handlers.RegisterUserHandler)
 	router.POST("SmakTown/API/signIn", handlers.SignInHandler)
-	// Обновление токена
 	router.PUT("SmakTown/API/refresh", handlers.RefreshTokenHandler)
-	// Получение данных пользователя
 	router.GET("SmakTown/API/user", handlers.GetUserHandler)
 
 	auth := router.Group("/auth")
 	auth.Use(handlers.AuthMiddleware())
 	{
-		// Получение данных от пользователя, если пропустит перехватчик
 		auth.GET("SmakTown/API/user", handlers.GetUserHandler)
 	}
-	router.Run(":" + envs.ServerEnvs.AUTH_PORT)
+
+	// Запуск сервера с указанным портом из переменных окружения
+	err := router.Run(":" + envs.ServerEnvs.AUTH_PORT)
+	if err != nil {
+		panic("Ошибка запуска сервера: " + err.Error())
+	}
 }
