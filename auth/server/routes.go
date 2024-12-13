@@ -11,19 +11,19 @@ func InitRoutes() {
 	// Инициализация роута (по умолчанию)
 	router := gin.Default()
 	// Создание пользователя
-	router.POST("/register", handlers.RegisterUserHandler)
+	router.POST("SmakTown/API/register", handlers.RegisterUserHandler)
 	// Авторизация пользователя
-	router.POST("/signIn", handlers.SignInHandler)
+	router.POST("SmakTown/API/signIn", handlers.SignInHandler)
 	// Обновление токена
-	router.PUT("/refresh", handlers.RefreshTokenHandler)
+	router.PUT("SmakTown/API/refresh", handlers.RefreshTokenHandler)
 	// Получение данных пользователя
-	router.GET("/user", handlers.GetUserHandler)
+	router.GET("SmakTown/API/user", handlers.GetUserHandler)
 
 	auth := router.Group("/auth")
 	auth.Use(handlers.AuthMiddleware())
 	{
 		// Получение данных от пользователя, если пропустит перехватчик
-		auth.GET("/user", handlers.GetUserHandler)
+		auth.GET("SmakTown/API/user", handlers.GetUserHandler)
 	}
 	router.Run(":" + envs.ServerEnvs.AUTH_PORT)
 }
