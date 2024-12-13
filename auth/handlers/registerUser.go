@@ -25,6 +25,7 @@ func registerUserHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при хэшировании пароля"})
 		return
 	}
+
 	// Проверяем валидность телефона
 	validPhone, err := utils.IsValidPhone(registerData.Phone)
 	if err != nil {
@@ -32,8 +33,18 @@ func registerUserHandler(ctx *gin.Context) {
 		return
 	}
 
+	// Проверяем, существует ли уже пользователь с таким номером телефона
+	var existingUser models.User
+	if err := database.DB.Where("phone = ?", validPhone).First(&existingUser).Error; err == nil {
+		// Если ошибка не произошла, это значит, что пользователь с таким номером уже существует
+		ctx.JSON(http.StatusConflict, gin.H{"error": "Номер телефона уже зарегистрирован"})
+		return
+	}
+
+	// Если номер телефона уникален, создаем нового пользователя
 	user.Phone = validPhone
 	user.Hash = hashedPassword
+
 	// Сохраняем пользователя в базу данных
 	result := database.DB.Create(&user)
 	if result.Error != nil {
@@ -42,5 +53,4 @@ func registerUserHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Регистрация пользователя прошла успешно"})
-
 }

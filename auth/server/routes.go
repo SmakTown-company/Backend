@@ -11,7 +11,7 @@ func InitRoutes() {
 	// Инициализация роута (по умолчанию)
 	router := gin.Default()
 	// Создание пользователя
-	router.POST("SmakTown/API/register", handlers.RegisterUserHandler)
+	router.POST("/register", handlers.RegisterUserHandler)
 	// Авторизация пользователя
 	router.POST("SmakTown/API/signIn", handlers.SignInHandler)
 	// Обновление токена

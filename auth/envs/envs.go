@@ -1,6 +1,9 @@
 package envs
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 // Хранение данных значений ENV
 var ServerEnvs Envs
@@ -28,6 +31,6 @@ func LoadEnvs() error {
 	ServerEnvs.POSTGRES_HOST = os.Getenv("POSTGRES_HOST")
 	ServerEnvs.POSTGRES_USE_SSL = os.Getenv("POSTGRES_USE_SSL")
 	ServerEnvs.AUTH_PORT = os.Getenv("AUTH_PORT")
-
+	fmt.Print(ServerEnvs)
 	return nil
 }
