@@ -14,12 +14,16 @@ import (
 
 // Объявление переменной MongoClient, хранящей ссылку на экземпляр клиента MongoDB
 var MongoClient *mongo.Client
+
+// Объявление коллекций
 var CardCollection *mongo.Collection
+var BasketCollection *mongo.Collection // Коллекция для корзин
 
 // Инициализация подключения к MongoDB
 func InitDatabase() error {
 	// Загружаем данные окружения из структуры envs
 	env := &envs.ServerEnvs
+
 	// Формируем URI для подключения к MongoDB
 	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", env.MONGO_INITDB_ROOT_USERNAME, env.MONGO_INITDB_ROOT_PASSWORD, env.MONGO_INITDB_HOST, env.MONGO_INITDB_PORT)
 	log.Println("URI: " + mongoURI)
@@ -42,8 +46,9 @@ func InitDatabase() error {
 	// Сохраняем клиента в глобальной переменной
 	MongoClient = client
 
-	// Инициализируем коллекцию для работы
-	CardCollection = MongoClient.Database("yourDatabase").Collection("cards")
+	// Инициализируем коллекции для работы
+	CardCollection = MongoClient.Database("card_db").Collection("card")
+	BasketCollection = MongoClient.Database("basket_db").Collection("baskets")
 
 	log.Println("Успешное подключение к MongoDB")
 	return nil

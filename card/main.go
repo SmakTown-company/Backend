@@ -2,14 +2,13 @@ package main
 
 import (
 	"card/server"
-	"log"
 )
 
-func main() {
+func init() {
+	server.InitServer()
 
-	// Инициализация и запуск маршрутов
-	router := server.InitRoutes()
-	if err := router.Run(":8080"); err != nil {
-		log.Fatal("Failed to start server:", err)
-	}
+}
+
+func main() {
+	server.StartServer()
 }

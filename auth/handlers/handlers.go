@@ -17,3 +17,7 @@ func GetUserHandler(ctx *gin.Context) {
 func RegisterUserHandler(ctx *gin.Context) {
 	registerUserHandler(ctx)
 }
+
+func GetUserForBasket(ctx *gin.Context) {
+	getUserForBasket(ctx)
+}
