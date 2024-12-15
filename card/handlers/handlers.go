@@ -6,6 +6,10 @@ func GetCardHandler(ctx *gin.Context) {
 	getCardHandler(ctx)
 }
 
+func GetCardDiscountHandler(ctx *gin.Context) {
+	getCardDiscountHandler(ctx)
+}
+
 func AddInBasket(ctx *gin.Context) {
-	addCardToBasket(ctx)
+	// функция для добавления в корзину
 }

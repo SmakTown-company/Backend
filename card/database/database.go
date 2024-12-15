@@ -48,7 +48,7 @@ func InitDatabase() error {
 
 	// Инициализируем коллекции для работы
 	CardCollection = MongoClient.Database("card_db").Collection("card")
-	BasketCollection = MongoClient.Database("basket_db").Collection("baskets")
+	BasketCollection = MongoClient.Database("basket_db").Collection("basket_users")
 
 	log.Println("Успешное подключение к MongoDB")
 	return nil
