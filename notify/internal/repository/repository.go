@@ -14,5 +14,7 @@ type Repository struct {
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		Notify: NewNotifyPostgres(db),
+	}
 }

@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  notify_db:
+    container_name: notify_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ilyas
+      MONGO_INITDB_ROOT_PASSWORD: ilyas
+    image: mongo:5.0.25
+    command: mongod --port 9101
+    ports:
+      - 9101:9101
+    volumes:
+      - db_notes_vol:/data/db
+    networks:
+        - server_net
+volumes:
+  db_notes_vol: {}
+
+networks:
+  server_net:
+    driver: bridge
