@@ -21,3 +21,7 @@ func RegisterUserHandler(ctx *gin.Context) {
 func GetUserForBasket(ctx *gin.Context) {
 	getUserForBasket(ctx)
 }
+
+func RenameUserHandler(ctx *gin.Context) {
+	renameUserHandler(ctx)
+}

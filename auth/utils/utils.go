@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"auth/database"
 	"auth/envs"
 	"auth/models"
 	"errors"
@@ -151,4 +152,22 @@ func IsValidEmail(email string) (string, error) {
 		return email, nil
 	}
 	return "", errors.New("Неверный формат email")
+}
+
+// Функция для получения пользователя по email
+func GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	if err := database.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// Функция для получения пользователя по ID
+func GetUserByID(id uint) (*models.User, error) {
+	var user models.User
+	if err := database.DB.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

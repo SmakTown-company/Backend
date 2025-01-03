@@ -27,6 +27,7 @@ func InitRoutes() {
 	router.PUT("SmakTown/API/refresh", handlers.RefreshTokenHandler)
 	router.GET("SmakTown/API/user", handlers.GetUserHandler)
 	router.GET("SmakTown/API/getUserBasket/:user_id", handlers.GetUserForBasket)
+	router.PUT("SmakTown/API/renameUser/:email", handlers.RenameUserHandler)
 
 	auth := router.Group("/auth")
 	auth.Use(handlers.AuthMiddleware())
