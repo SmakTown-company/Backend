@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/SmakTown-company/Backend/notify/internal/config"
 	"github.com/SmakTown-company/Backend/notify/internal/handlers"
@@ -35,9 +36,10 @@ func main() {
 	if err != nil {
 		logging.Logger.Warn(logging.MakeLog("Ошибка инициализации базы данных", err))
 	}
-	repos := repository.NewRepository(db)
+	ctx := context.Background()
+	repos := repository.NewRepository(db, ctx)
 	logging.Logger.Info("Инициализация репозитория")
-	services := services.NewService(repos)
+	services := services.NewService(repos, ctx)
 	logging.Logger.Info("Инициалиазация сервисов")
 	handlers := handlers.NewHandler(services)
 	logging.Logger.Info("Определение маршрутов")

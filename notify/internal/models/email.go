@@ -19,6 +19,3 @@ type EmailData struct {
 	Code     string        `json:"code,omitempty"`
 	Details  *EmailDetails `json:"details,omitempty"`
 }
-
-type EmailComfirm struct {
-}

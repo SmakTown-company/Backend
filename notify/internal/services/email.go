@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/SmakTown-company/Backend/notify/internal/models"
@@ -17,6 +18,7 @@ import (
 
 type EmailService struct {
 	repo     repository.Notify
+	ctx      context.Context
 	from     string
 	smtpPass string
 	smtpUser string
@@ -32,7 +34,7 @@ func (e *EmailService) Get(UserID string) (string, error) {
 	return email, nil
 }
 
-func NewEmailService(repo repository.Notify) *EmailService {
+func NewEmailService(repo repository.Notify, ctx context.Context) *EmailService {
 	return &EmailService{
 		repo:     repo,
 		from:     os.Getenv("EMAIL_FROM"),
@@ -40,9 +42,10 @@ func NewEmailService(repo repository.Notify) *EmailService {
 		smtpUser: os.Getenv("SMTP_USER"),
 		smtpHost: os.Getenv("SMTP_HOST"),
 		smtpPort: os.Getenv("SMTP_PORT"),
+		ctx:      ctx,
 	}
 }
-func (e *EmailService) Send(Template string, Data interface{}, To string) error {
+func (e *EmailService) Send(Data interface{}, To string) error {
 	newData, ok := Data.(models.NotificationRequest)
 	if !ok {
 		return fmt.Errorf("Ошибка преобразования в EmailData")

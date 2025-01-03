@@ -27,5 +27,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.POST("/notification", h.Notify)
+	router.GET("/notification", h.GetNotification)
 	return router
 }
