@@ -13,7 +13,7 @@ import (
 func signIn(ctx *gin.Context) {
 
 	var signInData struct {
-		Phone    string `json:"phone" binding:"required"`
+		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
@@ -27,7 +27,7 @@ func signIn(ctx *gin.Context) {
 
 	// Ищем пользователя по номеру телефона
 	var user models.User
-	result := database.DB.Where("phone = ?", signInData.Phone).First(&user)
+	result := database.DB.Where("email = ?", signInData.Email).First(&user)
 	if result.Error != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный телефон или пароль"})
 		return
@@ -49,10 +49,10 @@ func signIn(ctx *gin.Context) {
 	// Создаем анонимную структуру для ответа
 	userResponse := struct {
 		ID    uint   `json:"id"`
-		Phone string `json:"phone"`
+		Email string `json:"email"`
 	}{
 		ID:    user.ID,
-		Phone: user.Phone,
+		Email: user.Email,
 	}
 
 	// Отправляем успешный ответ
