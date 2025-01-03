@@ -134,3 +134,21 @@ func IsValidPhone(phone string) (string, error) {
 	// Если невалидный номер, возвращаем ошибку
 	return "", errors.New("неверный формат телефонного номера")
 }
+
+func IsValidEmail(email string) (string, error) {
+	// Если строка email пустая - ошибка
+	if email == "" {
+		return "", errors.New("Пустая строка email")
+	}
+	// Убираем пробелы, если они есть
+	email = strings.TrimSpace(email)
+
+	// Регулярное выражение для проверки email
+	re := `^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}$`
+	match, _ := regexp.MatchString(re, email)
+
+	if match {
+		return email, nil
+	}
+	return "", errors.New("Неверный формат email")
+}

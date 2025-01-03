@@ -34,15 +34,28 @@ func registerUserHandler(ctx *gin.Context) {
 	}
 
 	// Проверяем, существует ли уже пользователь с таким номером телефона
-	var existingUser models.User
-	if err := database.DB.Where("phone = ?", validPhone).First(&existingUser).Error; err == nil {
-		// Если ошибка не произошла, это значит, что пользователь с таким номером уже существует
+	var anExistingUserOnThePhone models.User
+	if err := database.DB.Where("phone = ?", validPhone).First(&anExistingUserOnThePhone).Error; err == nil {
 		ctx.JSON(http.StatusConflict, gin.H{"error": "Номер телефона уже зарегистрирован"})
 		return
 	}
 
-	// Если номер телефона уникален, создаем нового пользователя
+	// Проверяем валидность email
+	validEmail, err := utils.IsValidEmail(registerData.Email)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Неверный email"})
+		return
+	}
+	// Проверяем, существует ли уже пользователь с таким email
+	var anExistingUserOnTheEmail models.User
+	if err := database.DB.Where("email = ?", validEmail).First(&anExistingUserOnTheEmail).Error; err == nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": "Этот email уже зарегистрирован"})
+		return
+	}
+
+	// Если номер телефона и email уникален, создаем нового пользователя
 	user.Phone = validPhone
+	user.Email = validEmail
 	user.Hash = hashedPassword
 
 	// Сохраняем пользователя в базу данных
