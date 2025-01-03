@@ -144,7 +144,7 @@ func IsValidEmail(email string) (string, error) {
 	email = strings.TrimSpace(email)
 
 	// Регулярное выражение для проверки email
-	re := `^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}$`
+	re := `^[a-zA-Z0-9._%+-]{1,64}@(yandex\.ru|mail\.ru|gmail\.com)$`
 	match, _ := regexp.MatchString(re, email)
 
 	if match {

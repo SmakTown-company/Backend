@@ -54,6 +54,7 @@ func registerUserHandler(ctx *gin.Context) {
 	}
 
 	// Если номер телефона и email уникален, создаем нового пользователя
+	user.UserName = registerData.UserName
 	user.Phone = validPhone
 	user.Email = validEmail
 	user.Hash = hashedPassword
