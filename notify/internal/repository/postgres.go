@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
+type PostgresConfig struct {
 	Host     string
 	Port     string
 	Username string
@@ -18,7 +18,7 @@ type Config struct {
 	SSLMode  string
 }
 
-func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
+func NewPostgresDB(cfg PostgresConfig) (*sqlx.DB, error) {
 	// Подключение к базе "postgres" для проверки и создания основной БД
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=postgres password='%s' sslmode=%s", cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.SSLMode)
 	initialDB, err := sqlx.Open("postgres", connStr)
@@ -47,7 +47,7 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func Migrate(db *sqlx.DB, cfg Config) error {
+func Migrate(db *sqlx.DB, cfg PostgresConfig) error {
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("Ошибка создания объекта драйвера")

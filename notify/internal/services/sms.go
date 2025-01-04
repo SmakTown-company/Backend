@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 )
 
 type SmsService struct {
@@ -31,8 +32,11 @@ func NewSmsService(repo repository.Notify, ctx context.Context) *SmsService {
 	return &S
 }
 func (s SmsService) Get(UserID string) (string, error) {
-	//TODO implement me
-	panic("implement me")
+	phone, err := s.repo.GetNumber(UserID)
+	if err != nil {
+		return "", err
+	}
+	return phone, nil
 }
 
 func (s *SmsService) Send(Data interface{}, To string) error {
@@ -49,7 +53,7 @@ func (s *SmsService) Send(Data interface{}, To string) error {
 	if err != nil {
 		return fmt.Errorf("Ошибка преобразования в SmsData")
 	}
-	req, err := s.MakeURL(data)
+	req, err := s.MakeURL(data, To)
 	if err != nil {
 		return fmt.Errorf("ошибка при создании запроса: %v", err)
 	}
@@ -66,12 +70,19 @@ func (s *SmsService) Send(Data interface{}, To string) error {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("неожиданный статус ответа: %d, тело: %s", resp.StatusCode, string(body))
 	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("ошибка при чтении тела ответа: %v", err)
 	}
-
+	textBody := string(body)
+	re := regexp.MustCompile(`ERROR = (\d+) \((.*?)\)`)
+	matches := re.FindStringSubmatch(textBody)
+	if matches != nil {
+		errorCode := matches[1] // Код ошибки
+		errorDesc := matches[2] // Описание ошибки
+		err = fmt.Errorf(fmt.Sprintf("Код ошибки: %s. Описание ошибки: %s", errorCode, errorDesc))
+		return err
+	}
 	fmt.Printf("Ответ сервера: %s\n", string(body))
 	return nil
 	//
@@ -92,10 +103,10 @@ func (s *SmsService) Send(Data interface{}, To string) error {
 	//}
 }
 
-func (s *SmsService) MakeURL(data models.SmsData) (*http.Request, error) {
+func (s *SmsService) MakeURL(data models.SmsData, to string) (*http.Request, error) {
 	params := url.Values{}
 	params.Add("apikey", s.APIKEY)
-	params.Add("phones", data.To)
+	params.Add("phones", to)
 	params.Add("mes", data.BodyText)
 
 	fullURL := "https://smsc.ru/sys/send.php" + "?" + params.Encode()

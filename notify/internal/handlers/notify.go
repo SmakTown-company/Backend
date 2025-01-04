@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/SmakTown-company/Backend/notify/internal/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -16,7 +17,7 @@ func (h *Handler) Notify(c *gin.Context) {
 	var input models.NotificationRequest
 
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "Неправильный формат данных")
+		newResponse(c, http.StatusBadRequest, "Неправильный формат данных", err)
 		return
 	}
 	switch input.Channel {
@@ -29,14 +30,14 @@ func (h *Handler) Notify(c *gin.Context) {
 			var err error
 			email, err = h.service.Email.Get(input.UserID)
 			if err != nil {
-				newErrorResponse(c, http.StatusBadRequest, "Ошибка получения email адреса")
+				newResponse(c, http.StatusBadRequest, "Ошибка получения email адреса", err)
 				return
 			}
 		}
 
 		err := h.service.Email.Send(input, email)
 		if err != nil {
-			newErrorResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения")
+			newResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения", err)
 			return
 		}
 	case SMS:
@@ -48,28 +49,38 @@ func (h *Handler) Notify(c *gin.Context) {
 			var err error
 			phone_number, err = h.service.SMS.Get(input.UserID)
 			if err != nil {
-				newErrorResponse(c, http.StatusBadRequest, "Ошибка получения email адреса")
+				newResponse(c, http.StatusBadRequest, "Ошибка получения номера телефона", err)
 				return
 			}
 		}
 		err := h.service.SMS.Send(input, phone_number)
 		if err != nil {
-			newErrorResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения")
+			newResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения", err)
 			return
 		}
 	case PUSH:
 		err := h.service.Push.Send(input, input.UserID)
 		if err != nil {
-			newErrorResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения")
+			newResponse(c, http.StatusBadRequest, "Ошибка отправки сообщения", err)
 			return
 		}
+	default:
+		newResponse(c, http.StatusBadRequest, "Отсутствует такой метод уведомления", fmt.Errorf("Неверный метод уведомления"))
+		return
 	}
+	newResponse(c, http.StatusOK, "Уведомление доставлено", nil)
+
 }
 func (h *Handler) GetNotification(c *gin.Context) {
 	userID := c.Query("id")
 	pushTokens, err := h.service.Push.Get(userID)
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newResponse(c, http.StatusBadRequest, "Ошибка получения уведомления", err)
+		return
+	}
+	if len(pushTokens) == 0 {
+
+		newResponse(c, http.StatusOK, "Новых уведомлений нет", nil)
 		return
 	}
 	c.AbortWithStatusJSON(http.StatusOK, pushTokens)

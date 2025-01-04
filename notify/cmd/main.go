@@ -25,7 +25,7 @@ func main() {
 	if err := config.InitConfig(); err != nil {
 		logging.Logger.Warn(logging.MakeLog("Ошибка инициализации конфига", err))
 	}
-	db, err := repository.NewPostgresDB(repository.Config{
+	db, err := repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),

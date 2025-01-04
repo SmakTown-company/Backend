@@ -7,35 +7,33 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type NotifyMongo struct {
-	ctx context.Context
-	db  *sqlx.DB
+type NotifyDB struct {
+	ctx      context.Context
+	postgres *sqlx.DB
 }
 
-func NewNotifyPostgres(db *sqlx.DB, ctx context.Context) *NotifyMongo {
-	return &NotifyMongo{db: db, ctx: ctx}
+func NewNotifyPostgres(db *sqlx.DB, ctx context.Context) *NotifyDB {
+	return &NotifyDB{postgres: db, ctx: ctx}
 }
-func (n *NotifyMongo) GetEmail(UserID string) (string, error) {
-	query := `SELECT email FROM users WHERE id=$1`
-	var email string
-	err := n.db.QueryRow(query, UserID).Scan(&email)
+func (n *NotifyDB) getUserField(fieldName, userID string) (string, error) {
+	query := fmt.Sprintf(`SELECT %s FROM users WHERE id=$1`, fieldName)
+	var result string
+	err := n.postgres.QueryRow(query, userID).Scan(&result)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Ошибка получения %s: %w", fieldName, err)
 	}
-	return email, nil
+	return result, nil
 }
-func (n *NotifyMongo) GetNumber(UserID string) (string, error) {
-	query := `SELECT phone FROM users WHERE id=$1`
-	var number string
-	err := n.db.QueryRow(query, UserID).Scan(&number)
-	if err != nil {
-		return "", err
-	}
-	return number, nil
+func (n *NotifyDB) GetEmail(userID string) (string, error) {
+	return n.getUserField("email", userID)
 }
 
-func (n *NotifyMongo) GetPushToken(UserID string) ([]models.PushToken, error) {
-	tx, err := n.db.BeginTx(n.ctx, nil)
+func (n *NotifyDB) GetNumber(userID string) (string, error) {
+	return n.getUserField("phone", userID)
+}
+
+func (n *NotifyDB) GetPushToken(UserID string) ([]models.PushToken, error) {
+	tx, err := n.postgres.BeginTx(n.ctx, nil)
 	defer tx.Rollback()
 
 	if err != nil {
@@ -69,8 +67,8 @@ func (n *NotifyMongo) GetPushToken(UserID string) ([]models.PushToken, error) {
 	}
 	return pushTokens, nil
 }
-func (n *NotifyMongo) SendPushToken(UserID string, data models.PushData) error {
-	tx, err := n.db.BeginTx(n.ctx, nil)
+func (n *NotifyDB) SendPushToken(UserID string, data models.PushData) error {
+	tx, err := n.postgres.BeginTx(n.ctx, nil)
 	defer tx.Rollback() // Откат транзакции в случае ошибки
 
 	if err != nil {
