@@ -7,11 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/exp/rand"
 )
 
 // Хэшируем пароль при помощи bcrypt
@@ -170,4 +172,11 @@ func GetUserByID(id uint) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+// Генерация токена для верификации
+func GenerateVerifiedToken() string {
+	rand.Seed(uint64(time.Now().UnixNano()))
+	code := rand.Intn(1000000)
+	return strconv.Itoa(code)
 }

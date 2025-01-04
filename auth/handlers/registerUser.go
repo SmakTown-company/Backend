@@ -58,6 +58,7 @@ func registerUserHandler(ctx *gin.Context) {
 	user.Phone = validPhone
 	user.Email = validEmail
 	user.Hash = hashedPassword
+	user.Verified = false
 
 	// Сохраняем пользователя в базу данных
 	result := database.DB.Create(&user)

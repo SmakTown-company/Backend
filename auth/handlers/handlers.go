@@ -25,3 +25,10 @@ func GetUserForBasket(ctx *gin.Context) {
 func RenameUserHandler(ctx *gin.Context) {
 	renameUserHandler(ctx)
 }
+func CreateVerifiedTokenHandler(ctx *gin.Context) {
+	createVerificationToken(ctx)
+
+}
+func VerifyTokenHandler(ctx *gin.Context) {
+	verifyToken(ctx)
+}

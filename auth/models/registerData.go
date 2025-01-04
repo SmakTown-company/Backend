@@ -9,4 +9,6 @@ type RegisterData struct {
 	Phone string `json:"phone" binding:"required,min=12"`
 	// Требуется валидный пароль
 	Password string `json:"password" binding:"required,min=8"`
+
+	Verified bool `json:"verified"`
 }
