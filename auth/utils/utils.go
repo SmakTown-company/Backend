@@ -180,3 +180,17 @@ func GenerateVerifiedToken() string {
 	code := rand.Intn(1000000)
 	return strconv.Itoa(code)
 }
+
+// Функция для проверки токена на истечение срока действия
+func CheckTokenExpiration(token string) bool {
+	var verificationToken models.VerificationToken
+
+	if err := database.DB.Where("token = ?", token).First(&verificationToken).Error; err != nil {
+		return false
+	}
+
+	if verificationToken.ExpiresAt.Before(time.Now()) {
+		return false
+	}
+	return true
+}

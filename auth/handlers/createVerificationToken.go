@@ -30,6 +30,20 @@ func createVerificationToken(ctx *gin.Context) {
 		return
 	}
 
+	var existingToken models.VerificationToken
+	err := database.DB.Where("email = ? OR phone = ?", input.Email, input.Phone).Where("confirmed_at IS NULL").First(&existingToken).Error
+
+	if err == nil {
+		if time.Now().After(existingToken.ExpiresAt) {
+			if err := database.DB.Delete(&existingToken).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, "Ошибка при удалении старого токена")
+				return
+			}
+		} else {
+			ctx.JSON(http.StatusBadRequest, "Для данного пользователя уже существует неподтвержденный токен")
+		}
+	}
+
 	// Генерация токена
 	token := utils.GenerateVerifiedToken()
 

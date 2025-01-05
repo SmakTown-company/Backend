@@ -21,5 +21,5 @@ type VerificationToken struct {
 	Phone       string    `gorm:"not null"`
 	Token       string    `gorm:"not null;unique"`
 	ExpiresAt   time.Time `gorm:"not null"`
-	ConfirmedAt *int64
+	ConfirmedAt time.Time
 }
