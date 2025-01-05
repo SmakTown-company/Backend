@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"github.com/SmakTown-company/Backend/notify/internal/services"

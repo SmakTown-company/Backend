@@ -1,0 +1,11 @@
+port: "8081"
+
+db:
+  host: "localhost"
+  port: "9102"
+  db: 1
+  protocol: 2
+
+payment:
+  method: "bank-card"
+  return_url: "www.example.com"
