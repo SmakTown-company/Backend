@@ -1,15 +1,15 @@
 package utils
 
 import (
-	"auth/database"
-	"auth/envs"
-	"auth/models"
 	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+	"user/database"
+	"user/envs"
+	"user/models"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"

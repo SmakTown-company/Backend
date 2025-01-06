@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"auth/database"
-	"auth/models"
 	"net/http"
+	"user/database"
+	"user/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

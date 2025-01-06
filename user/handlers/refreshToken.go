@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"auth/utils"
 	"net/http"
+	"user/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,10 +1,10 @@
 package server
 
 import (
-	"auth/database"
-	"auth/envs"
-	"auth/models"
 	"log"
+	"user/database"
+	"user/envs"
+	"user/models"
 )
 
 func InitServer() {

@@ -1,6 +1,6 @@
 package main
 
-import "auth/server"
+import "user/server"
 
 func init() {
 	server.InitServer()

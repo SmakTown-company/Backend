@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"auth/database"
-	"auth/models"
-	"auth/utils"
 	"log"
 	"net/http"
+	"user/database"
+	"user/models"
+	"user/utils"
 
 	"github.com/gin-gonic/gin"
 )

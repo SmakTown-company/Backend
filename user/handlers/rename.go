@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"auth/database"
-	"auth/utils"
 	"errors"
 	"net/http"
+	"user/database"
+	"user/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"auth/envs"
-	"auth/handlers"
+	"user/envs"
+	"user/handlers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

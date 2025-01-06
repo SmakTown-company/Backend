@@ -1,8 +1,8 @@
 package database
 
 import (
-	"auth/envs"
 	"fmt"
+	"user/envs"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
