@@ -1,6 +1,8 @@
 package server
 
 import (
+	"basket/handlers"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -17,13 +19,9 @@ func InitRoutes() *gin.Engine {
 		MaxAge:           12 * 3600,                                           // Максимальное время кеширования CORS в секундах (12 часов)
 	}))
 
-	/*
-		router.GET("SmakTown/API/getAllCards", handlers.GetCardHandler)
-		router.GET("SmakTown/API/getCardDiscount", handlers.GetCardDiscountHandler)
-		router.POST("SmakTown/API/addInBasket", handlers.AddInBasket)
-	*/
+	router.POST("SmakTown/API/addInBasket", handlers.AddInBasketHandler)
 
-	router.Run(":8080")
+	router.Run(":8081")
 
 	return router
 }

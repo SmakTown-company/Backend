@@ -6,8 +6,3 @@ type BasketItem struct {
 	Price       string `json:"price" bson:"price"`
 	Quantity    int    `json:"quantity" bson:"quantity"`
 }
-
-type Basket struct {
-	UserID string       `json:"user_id" bson:"user_id"`
-	Items  []BasketItem `json:"items" bson:"items"`
-}

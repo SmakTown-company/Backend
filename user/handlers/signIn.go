@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"user/database"
 	"user/models"
 	"user/utils"
@@ -25,7 +26,7 @@ func signIn(ctx *gin.Context) {
 	}
 	log.Printf("Received sign-in data: %+v", signInData) // Логируем полученные данные
 
-	// Ищем пользователя по номеру телефона
+	// Ищем пользователя по номеру email
 	var user models.User
 	result := database.DB.Where("email = ?", signInData.Email).First(&user)
 	if result.Error != nil {
@@ -48,12 +49,19 @@ func signIn(ctx *gin.Context) {
 
 	// Создаем анонимную структуру для ответа
 	userResponse := struct {
-		ID    uint   `json:"id"`
-		Email string `json:"email"`
+		ID       uint   `json:"id"`
+		Email    string `json:"email"`
+		Verified bool   `json:"verified"`
 	}{
-		ID:    user.ID,
-		Email: user.Email,
+		ID:       user.ID,
+		Email:    user.Email,
+		Verified: user.Verified,
 	}
+	userIDstr := strconv.FormatUint(uint64(user.ID), 10)
+	verifiedStr := strconv.FormatBool(user.Verified)
+
+	ctx.SetCookie("user_id", userIDstr, 7200, "/cookie", "", false, true)
+	ctx.SetCookie("verified", verifiedStr, 7200, "/cookie", "", false, true)
 
 	// Отправляем успешный ответ
 	ctx.JSON(http.StatusOK, gin.H{"tokens": tokens, "user": userResponse})

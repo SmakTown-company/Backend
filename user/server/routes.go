@@ -30,6 +30,7 @@ func InitRoutes() {
 	router.PUT("SmakTown/API/renameUser/:email", handlers.RenameUserHandler)
 	router.POST("SmakTown/API/createVerificationToken", handlers.CreateVerifiedTokenHandler)
 	router.GET("SmakTown/API/verifyToken", handlers.VerifyTokenHandler)
+	router.POST("SmakTown/API/checkCookie", handlers.CheackCookiHandler)
 
 	auth := router.Group("/auth")
 	auth.Use(handlers.AuthMiddleware())

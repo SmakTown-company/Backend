@@ -25,7 +25,7 @@ func InitDatabase() error {
 	env := &envs.ServerEnvs
 
 	// Формируем URI для подключения к MongoDB
-	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", env.MONGO_INITDB_ROOT_USERNAME, env.MONGO_INITDB_ROOT_PASSWORD, env.MONGO_INITDB_HOST, env.MONGO_INITDB_PORT)
+	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", env.MONGO_INITDB_ROOT_USERNAME_BASKET, env.MONGO_INITDB_ROOT_PASSWORD_BASKET, env.MONGO_INITDB_HOST_BASKET, env.MONGO_INITDB_PORT_BASKET)
 	log.Println("URI: " + mongoURI)
 
 	// Создаем новый контекст с таймаутом и предусматриваем его корректное завершение
@@ -47,7 +47,6 @@ func InitDatabase() error {
 	MongoClient = client
 
 	// Инициализируем коллекции для работы
-	CardCollection = MongoClient.Database("card_db").Collection("card")
 	BasketCollection = MongoClient.Database("basket_db").Collection("basket_users")
 
 	log.Println("Успешное подключение к MongoDB")

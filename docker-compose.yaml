@@ -7,15 +7,15 @@ services:
     container_name: db_card
     # Значения переменных окружения
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME_CARD: ${MONGO_INITDB_ROOT_USERNAME_CARD}
+      MONGO_INITDB_ROOT_PASSWORD_CARD: ${MONGO_INITDB_ROOT_PASSWORD_CARD}
     # Образ для контейнера который будет скачан из DockerHub
     image: mongo:5.0.25
     # Меняем порт MongoDB в контейнере
-    command: mongod --port ${MONGO_INITDB_PORT}
+    command: mongod --port ${MONGO_INITDB_PORT_CARD}
     # Порты, которые будут использоваться в контейнере
     ports:
-      - ${MONGO_INITDB_PORT}:${MONGO_INITDB_PORT}
+      - ${MONGO_INITDB_PORT_CARD}:${MONGO_INITDB_PORT_CARD}
     # Настройки хранилища данных, необходим для сохранения
     # данных в базе данных при остановке контейнера
     volumes:
@@ -47,10 +47,59 @@ services:
       # Секретный ключ для аутентификации
       JWT_SECRET: ${JWT_SECRET}
       # Настройки MongoDB, указываем в контейнере 
-      MONGO_INITDB_HOST: ${MONGO_INITDB_HOST}
-      MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_HOST_CARD: ${MONGO_INITDB_HOST_CARD}
+      MONGO_INITDB_PORT_CARD: ${MONGO_INITDB_PORT_CARD}
+      MONGO_INITDB_ROOT_USERNAME_CARD: ${MONGO_INITDB_ROOT_USERNAME_CARD}
+      MONGO_INITDB_ROOT_PASSWORD_CARD: ${MONGO_INITDB_ROOT_PASSWORD_CARD}
+
+
+    db_basket:
+      container_name: db_basket
+
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
+
+      image: mongo:5.0.25
+
+      command: mongod --port ${MONGO_INITDB_PORT_BASKET}
+
+      ports:
+        - ${MONGO_INITDB_PORT_BASKET}:${MONGO_INITDB_PORT_BASKET}
+
+
+      volumes:
+        - db_card_vol:/var/data/db/data/configdb
+
+      networks:
+        - server_net
+
+    basket:
+      # Название контейнера
+      container_name: basket 
+      # Папка контейнера для сборки
+      build: ./basket
+      # Указывает, что контейнер должен ждать запуск контейнеров
+      depends_on:
+        - db_basket
+      # Объявляем внутреннюю сеть докера, для 
+      # передачи данных между контейнерами
+      networks:
+        - server_net
+      # Порты которые будут использоваться в контейнере
+      ports:
+        - ${BASKET_PORT}:${BASKET_PORT}
+      # Внешние переменные окружения
+      environment:
+        # Порт который будет использоваться в контейнере
+        BASKET_PORT: ${BASKET_PORT}
+        # Секретный ключ для аутентификации
+        JWT_SECRET: ${JWT_SECRET}
+        # Настройки MongoDB, указываем в контейнере 
+        MONGO_INITDB_HOST: ${MONGO_INITDB_HOST_BASKET}
+        MONGO_INITDB_PORT: ${MONGO_INITDB_PORT_BASKET}
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
       
 
   # БД для сервиса управления пользователями

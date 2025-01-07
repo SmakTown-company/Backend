@@ -1,9 +1,12 @@
 package main
 
-func init() {
+import "basket/server"
 
+func init() {
+	server.InitServer()
 }
 
 func main() {
+	server.StartServer()
 
 }

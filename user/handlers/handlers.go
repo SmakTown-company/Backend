@@ -32,3 +32,7 @@ func CreateVerifiedTokenHandler(ctx *gin.Context) {
 func VerifyTokenHandler(ctx *gin.Context) {
 	verifyToken(ctx)
 }
+
+func CheackCookiHandler(ctx *gin.Context) {
+	cheackCookie(ctx)
+}
