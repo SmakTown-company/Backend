@@ -21,7 +21,7 @@ func InitRoutes() *gin.Engine {
 
 	router.GET("SmakTown/API/getAllCards", handlers.GetCardHandler)
 	router.GET("SmakTown/API/getCardDiscount", handlers.GetCardDiscountHandler)
-	router.POST("SmakTown/API/addInBasket", handlers.AddInBasket)
+	router.GET("SmakTown/API/cardForBasket/:id", handlers.CardForBasket)
 
 	router.Run(":8080")
 

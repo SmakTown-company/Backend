@@ -1,6 +1,6 @@
 package models
 
 type BasketUser struct {
-	UserInfo
-	Card
+	UserInfo `json:"user" bson:"user"`
+	Card     `json:"card" bson:"card"`
 }

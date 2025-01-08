@@ -5,6 +5,7 @@ import (
 	"basket/models"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -36,8 +37,15 @@ func addInBasket(ctx *gin.Context) {
 		Verified: userData.Verified,
 	}
 
-	urlforProduct := "http://localhost:9101/SmakTown/API/addInBasket"
+	var requestData struct {
+		ProductID uint `json:"product_id"`
+	}
+	if err := ctx.ShouldBindJSON(&requestData); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+		return
+	}
 
+	urlforProduct := fmt.Sprintf("http://localhost:9101/SmakTown/API/cardForBasket/%d", requestData.ProductID)
 	responseforProduct, errForProduct := http.Get(urlforProduct)
 	if errForProduct != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Не удалось получить данные из каталога товаров"})
@@ -59,6 +67,7 @@ func addInBasket(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Не удалось изъять информацию о товаре"})
 		return
 	}
+
 	basketProduct := models.Card{
 		ID:             productData.ID,
 		Image:          productData.Image,

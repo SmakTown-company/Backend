@@ -16,8 +16,8 @@ import (
 var MongoClient *mongo.Client
 
 // Объявление коллекций
-var CardCollection *mongo.Collection
-var BasketCollection *mongo.Collection // Коллекция для корзин
+
+var BasketCollection *mongo.Collection
 
 // Инициализация подключения к MongoDB
 func InitDatabase() error {
@@ -29,7 +29,7 @@ func InitDatabase() error {
 	log.Println("URI: " + mongoURI)
 
 	// Создаем новый контекст с таймаутом и предусматриваем его корректное завершение
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	// Создаем клиента MongoDB и пытаемся подключиться

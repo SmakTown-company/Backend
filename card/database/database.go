@@ -17,36 +17,32 @@ var MongoClient *mongo.Client
 
 // Объявление коллекций
 var CardCollection *mongo.Collection
-var BasketCollection *mongo.Collection // Коллекция для корзин
 
 // Инициализация подключения к MongoDB
 func InitDatabase() error {
-	// Загружаем данные окружения из структуры envs
 	env := &envs.ServerEnvs
 
 	// Формируем URI для подключения к MongoDB
 	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", env.MONGO_INITDB_ROOT_USERNAME_CARD, env.MONGO_INITDB_ROOT_PASSWORD_CARD, env.MONGO_INITDB_HOST_CARD, env.MONGO_INITDB_PORT_CARD)
 	log.Println("URI: " + mongoURI)
 
-	// Создаем новый контекст с таймаутом и предусматриваем его корректное завершение
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Увеличиваем таймаут подключения
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Создаем клиента MongoDB и пытаемся подключиться
+	// Подключаемся к MongoDB
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		return fmt.Errorf("Ошибка при подключении к MongoDB: %v", err)
 	}
 
-	// Проверяем подключение к базе данных
+	// Проверяем подключение
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		return fmt.Errorf("Ошибка при подключении к MongoDB: %v", err)
 	}
 
-	// Сохраняем клиента в глобальной переменной
+	// Сохраняем клиента и инициализируем коллекции
 	MongoClient = client
-
-	// Инициализируем коллекции для работы
 	CardCollection = MongoClient.Database("card_db").Collection("card")
 
 	log.Println("Успешное подключение к MongoDB")

@@ -1,168 +1,152 @@
-
+version: '3.8'
 
 services:
   # БД для сервиса с картами
   db_card:
-    # Название контейнера
     container_name: db_card
-    # Значения переменных окружения
     environment:
       MONGO_INITDB_ROOT_USERNAME_CARD: ${MONGO_INITDB_ROOT_USERNAME_CARD}
       MONGO_INITDB_ROOT_PASSWORD_CARD: ${MONGO_INITDB_ROOT_PASSWORD_CARD}
-    # Образ для контейнера который будет скачан из DockerHub
     image: mongo:5.0.25
-    # Меняем порт MongoDB в контейнере
     command: mongod --port ${MONGO_INITDB_PORT_CARD}
-    # Порты, которые будут использоваться в контейнере
     ports:
       - ${MONGO_INITDB_PORT_CARD}:${MONGO_INITDB_PORT_CARD}
-    # Настройки хранилища данных, необходим для сохранения
-    # данных в базе данных при остановке контейнера
     volumes:
-      - db_card_vol:/var/data/db/data/configdb
-    # Объявляем внутренную сеть докера, для 
-    # передачи данных между контейнерами
+      - db_card_vol:/data/db
     networks:
       - server_net
-  # Сервис для управлением заметками 
+
+  # Сервис для управления заметками
   card:
-    # Название контейнера
     container_name: card 
-    # Папка контейнера для сборки
     build: ./card
-    # Указывает, что контейнер должен ждать запуск контейнеров
     depends_on:
       - db_card 
-    # Объявляем внутреннюю сеть докера, для 
-    # передачи данных между контейнерами
     networks:
       - server_net
-    # Порты которые будут использоваться в контейнере
     ports:
       - ${CARD_PORT}:${CARD_PORT}
-    # Внешние переменные окружения
     environment:
-      # Порт который будет использоваться в контейнере
       CARD_PORT: ${CARD_PORT}
-      # Секретный ключ для аутентификации
       JWT_SECRET: ${JWT_SECRET}
-      # Настройки MongoDB, указываем в контейнере 
       MONGO_INITDB_HOST_CARD: ${MONGO_INITDB_HOST_CARD}
       MONGO_INITDB_PORT_CARD: ${MONGO_INITDB_PORT_CARD}
       MONGO_INITDB_ROOT_USERNAME_CARD: ${MONGO_INITDB_ROOT_USERNAME_CARD}
       MONGO_INITDB_ROOT_PASSWORD_CARD: ${MONGO_INITDB_ROOT_PASSWORD_CARD}
 
+  # БД для корзины
+  db_basket:
+    container_name: db_basket
+    environment:
+      MONGO_INITDB_ROOT_USERNAME_BASKET: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
+      MONGO_INITDB_ROOT_PASSWORD_BASKET: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
+    image: mongo:5.0.25
+    command: mongod --port ${MONGO_INITDB_PORT_BASKET}
+    ports:
+      - ${MONGO_INITDB_PORT_BASKET}:${MONGO_INITDB_PORT_BASKET}
+    volumes:
+      - db_basket_vol:/data/db
+    networks:
+      - server_net
 
-    db_basket:
-      container_name: db_basket
-
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
-        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
-
-      image: mongo:5.0.25
-
-      command: mongod --port ${MONGO_INITDB_PORT_BASKET}
-
-      ports:
-        - ${MONGO_INITDB_PORT_BASKET}:${MONGO_INITDB_PORT_BASKET}
-
-
-      volumes:
-        - db_card_vol:/var/data/db/data/configdb
-
-      networks:
-        - server_net
-
-    basket:
-      # Название контейнера
-      container_name: basket 
-      # Папка контейнера для сборки
-      build: ./basket
-      # Указывает, что контейнер должен ждать запуск контейнеров
-      depends_on:
-        - db_basket
-      # Объявляем внутреннюю сеть докера, для 
-      # передачи данных между контейнерами
-      networks:
-        - server_net
-      # Порты которые будут использоваться в контейнере
-      ports:
-        - ${BASKET_PORT}:${BASKET_PORT}
-      # Внешние переменные окружения
-      environment:
-        # Порт который будет использоваться в контейнере
-        BASKET_PORT: ${BASKET_PORT}
-        # Секретный ключ для аутентификации
-        JWT_SECRET: ${JWT_SECRET}
-        # Настройки MongoDB, указываем в контейнере 
-        MONGO_INITDB_HOST: ${MONGO_INITDB_HOST_BASKET}
-        MONGO_INITDB_PORT: ${MONGO_INITDB_PORT_BASKET}
-        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
-        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
-      
+  # Сервис для корзины
+  basket:
+    container_name: basket
+    build: ./basket
+    depends_on:
+      - db_basket
+    networks:
+      - server_net
+    ports:
+      - ${BASKET_PORT}:${BASKET_PORT}
+    environment:
+      BASKET_PORT: ${BASKET_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      MONGO_INITDB_HOST_BASKET: ${MONGO_INITDB_HOST_BASKET}
+      MONGO_INITDB_PORT_BASKET: ${MONGO_INITDB_PORT_BASKET}
+      MONGO_INITDB_ROOT_USERNAME_BASKET: ${MONGO_INITDB_ROOT_USERNAME_BASKET}
+      MONGO_INITDB_ROOT_PASSWORD_BASKET: ${MONGO_INITDB_ROOT_PASSWORD_BASKET}
 
   # БД для сервиса управления пользователями
-  db_auth:
-    # Название контейнера
-    container_name: db_auth 
-    # Значение переменных окружения
+  db_user:
+    container_name: db_user 
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    # Образ контейнера который будет скачан из DockerHub
     image: postgres:latest
-    # Порты которые будут использоваться в контейнере
     ports:
       - ${POSTGRES_PORT}:5432
-    # Меняем порт по умолчанию в Postgres контейнере
-    
-    # Настройки хранилища данных, необходим для сохранения
-    # данных в базе данных при остановке контейнера
     volumes:
       - db_auth_voll:/var/lib/postgresql/data
-    # Объявляем внутреннюю сеть докера, для
-    # передачи данных между контейнерами
     networks:
       - server_net
- # Cервис для управления пользователем
-  auth:
-    # Название контейнера
-    container_name: auth
-    # Папка контейнера для сборки
-    build: ./auth
-    # Указывает, что контейнер должен ждать запуск контейнеров
-    # Так как необходимо, чтобы MongoDB и Redis были запущены
+
+  # Сервис для управления пользователями
+  user:
+    container_name: user
+    build: ./user
     depends_on:
-      - db_auth
-    # Объявляем внутренную сеть докера, для 
-    # передачи данных между контейнерами
+      - db_user
     networks:
       - server_net
-    # Порты, которые будут использоваться в контейнере
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
-    # Внешние переменные окружения
     environment:
-      # Порт который будет использоваться в контейнере
       AUTH_PORT: ${AUTH_PORT}
-      # Секретный ключ для аутентификации
       JWT_SECRET: ${JWT_SECRET}
-      # Настройки MongoDB, укзаваем в контейнере
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PORT: 5432
       POSTGRES_NAME: ${POSTGRES_NAME}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USE_SSL: ${POSTGRES_USE_SSL}
-      
-# Конфигурация для хранилища данных
+
+  # Zookeeper для Kafka (новый образ)
+  zookeeper:
+    image: wurstmeister/zookeeper:latest # Используем более новый образ
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_ADMINSERVER_ENABLED: "true"
+      ZOOKEEPER_SERVER_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - server_net
+
+  # Kafka (новый образ)
+  kafka:
+    image: confluentinc/cp-kafka:latest  # Используем официальный образ Confluent
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"    # Порты для Kafka
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENER: INSIDE://kafka:9093
+      KAFKA_LISTENER_INTERNAL: INTERNAL://kafka:9093
+      KAFKA_LISTENER_OUTSIDE: OUTSIDE://localhost:9092
+      KAFKA_LISTENER_PORT: 9093
+      KAFKA_LISTENER_INTER_BROKER: INTERNAL
+      KAFKA_LISTENER_NAME_INTERNAL: INTERNAL
+      KAFKA_LISTENER_NAME_OUTSIDE: OUTSIDE
+      KAFKA_LISTENER_INTER_BROKER_PORT: 9093
+      KAFKA_LISTENER_OUTSIDE_PORT: 9092
+    volumes:
+      - /tmp/broker-metadata:/var/lib/kafka/data
+    expose:
+      - "9093"         # Порт для внутренних нужд
+    networks:
+      - server_net
+
 volumes:
   db_card_vol: {}
   db_auth_voll: {}
-  
+  db_basket_vol: {}
 
-# Настройки сетей
 networks:
   server_net:
     driver: bridge
